@@ -1,25 +1,33 @@
 
-//TODO do the thing with ajax in progress
+//TODO do the thing with ajax in progress globally?
+//TODO maybe que stuff when in progress?
+//Need this send(), another on(event, selector), another go() which will be abstract on send()
+//This send() needs to give me a deffered
 
 var Ajax = {};
 
-Ajax.prototype.send = function(){
+Ajax.prototype.send = function(params){
 
-
-    //TODO this thing can be an object or single parameters
-    jQ.ajax({
+    var defaults = {
         type: 'POST',
-        url: '/index.php?action=ajax_widget_request',
-        data: dataForm,
-        cache: false,
-        contentType: false,
-        processData: false,
-        success: function(data){
-        },
-        complete: function () {
+        url: '',
+        data: {},
+        beforeSend: function(){}
+    };
 
-        }
-    });
+    //TODO
+    //if (AJAX_IN_PROGRESS) return;
+    //AJAX_IN_PROGRESS = true;
 
+    params = $.extend({}, params);
+
+    //Overwrite these callback hooks
+    params.error = function(){};
+    params.success = function(){};
+    params.complete = function(){};
+
+    return jQuery.ajax(params);
+
+    //TODO test overwriting error, success, complete
 
 };
