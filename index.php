@@ -21,16 +21,20 @@ if ( !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_RE
 
 
 <a id="simpleRequest" href="#">Send simple request</a>
+<a id="onRequest" href="#">Send on request</a>
+<a id="onPotsRequest" href="#">Send on post request</a>
+<a id="potsRequest" href="#">Send post request</a>
 
 <script type="text/javascript">
 
-    var a = new Ajax();
-
-    $("a#simpleRequest").on("click", function(e){
-        var params = {
+    var a = new Ajax(),
+        params = {
             url: 'index.php',
             data: { user: 'Inevitable', password: 'a110rN0th1nG'}
-        };
+    };
+
+    $("a#simpleRequest").on("click", function(e){
+
         e.preventDefault();
 
         a.send(params)
@@ -41,6 +45,16 @@ if ( !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_RE
                 console.log( 'SIMPLE REQUEST DONE' );
             });
     });
+
+    a.on('click', 'a#onRequest', params)
+        .done(function(data){
+            console.log( data );
+        })
+        .always(function(){
+            console.log( 'ON REQUEST DONE' );
+        });
+
+    //TODO test the new methods
 
 </script>
 

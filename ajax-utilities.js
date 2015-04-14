@@ -23,13 +23,29 @@ Ajax.prototype.send = function(params){
 };
 
 Ajax.prototype.on = function(event, selector, ajaxOptions) {
+
     var self = this;
 
-    $(document).on(event, selector, function(e){
-        e.preventDefault();
+    //Return a Deferred so you can be able to hook done(), fail() and always() to Ajax.on()
+    return jQuery.Deferred(function(deferred) {
 
-        return self.send(ajaxOptions);
-    });
+        //Listen for DOM event on selector
+        jQuery(document).on(event, selector, function(e) {
+
+            e.preventDefault();
+
+            //When event occurs send request
+            self.send(ajaxOptions)
+                .done(function(reponse) {
+                    //If request succeeds resolve the deferred that is hooked to the Ajax.on() (meaning resolve self)
+                    deferred.resolve(reponse);
+                })
+                .fail(function(response){
+                    //If request fails reject the deferred that is hooked to the Ajax.on() (meaning reject self)
+                    deferred.reject(response);
+                });
+        });
+    }).promise();
 };
 
 Ajax.prototype.onPost = function(event, selector, ajaxUrl, ajaxData) {
