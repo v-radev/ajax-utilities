@@ -1,10 +1,4 @@
 
-//TODO do the thing with ajax in progress globally?
-//TODO maybe que stuff when in progress?
-//Need this send(), another on(event, selector), another go() which will be abstract on send()
-//This send() needs to give me a deffered
-//Maybe make another utils with que?
-
 var Ajax = function (){
     return this;
 };
@@ -12,7 +6,7 @@ var Ajax = function (){
 Ajax.prototype.send = function(params){
 
     var defaults = {
-        type: 'POST',
+        method: 'POST',
         url: '',
         data: {},
         beforeSend: function(){}
@@ -26,5 +20,43 @@ Ajax.prototype.send = function(params){
     params.complete = function(){};
 
     return jQuery.ajax(params);
+};
+
+Ajax.prototype.on = function(event, selector, ajaxOptions) {
+    var self = this;
+
+    $(document).on(event, selector, function(e){
+        e.preventDefault();
+
+        return self.send(ajaxOptions);
+    });
+};
+
+Ajax.prototype.onPost = function(event, selector, ajaxUrl, ajaxData) {
+
+    ajaxUrl = typeof ajaxUrl !== 'undefined' ? ajaxUrl : '';
+    ajaxData = typeof ajaxData !== 'undefined' ? ajaxData : {};
+
+    this.on(event, selector, { method: 'POST', url: ajaxUrl, data: ajaxData })
+        .done(function(data){
+            return data;
+        })
+        .fail(function(){
+            return false;
+        });
+};
+
+Ajax.prototype.post = function(ajaxUrl, ajaxData) {
+
+    ajaxUrl = typeof ajaxUrl !== 'undefined' ? ajaxUrl : '';
+    ajaxData = typeof ajaxData !== 'undefined' ? ajaxData : {};
+
+    this.send({ method: 'POST', url: ajaxUrl, data: ajaxData })
+        .done(function(data){
+            return data;
+        })
+        .fail(function(){
+            return false;
+        });
 };
 
