@@ -3,8 +3,11 @@
 //TODO maybe que stuff when in progress?
 //Need this send(), another on(event, selector), another go() which will be abstract on send()
 //This send() needs to give me a deffered
+//Maybe make another utils with que?
 
-var Ajax = {};
+var Ajax = function (){
+    return this;
+};
 
 Ajax.prototype.send = function(params){
 
@@ -15,11 +18,7 @@ Ajax.prototype.send = function(params){
         beforeSend: function(){}
     };
 
-    //TODO
-    //if (AJAX_IN_PROGRESS) return;
-    //AJAX_IN_PROGRESS = true;
-
-    params = $.extend({}, params);
+    params = $.extend(defaults, params);
 
     //Overwrite these callback hooks
     params.error = function(){};
@@ -27,7 +26,5 @@ Ajax.prototype.send = function(params){
     params.complete = function(){};
 
     return jQuery.ajax(params);
-
-    //TODO test overwriting error, success, complete
-
 };
+
