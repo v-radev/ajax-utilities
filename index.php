@@ -22,8 +22,8 @@ if ( !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_RE
 
 <a id="simpleRequest" href="#">Send simple request</a>
 <a id="onRequest" href="#">Send on request</a>
-<a id="onPotsRequest" href="#">Send on post request</a>
 <a id="potsRequest" href="#">Send post request</a>
+<a id="onPostRequest" href="#">Send on post request</a>
 
 <script type="text/javascript">
 
@@ -54,7 +54,26 @@ if ( !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_RE
             console.log( 'ON REQUEST DONE' );
         });
 
-    //TODO test the new methods
+    $("a#potsRequest").on("click", function(e){
+
+        e.preventDefault();
+
+        a.post('index.php', { user: 'Roku', password: 'a110rN0th1nG'})
+            .done(function(data){
+                console.log( data );
+            })
+            .always(function(){
+                console.log( 'POST REQUEST DONE' );
+            });
+    });
+
+    a.onPost('click', 'a#onPostRequest', 'index.php', { user: 'Roku', password: 'a110rN0th1nG'})
+        .done(function(data){
+            console.log( data );
+        })
+        .always(function(){
+            console.log( 'ONPOST REQUEST DONE' );
+        });
 
 </script>
 

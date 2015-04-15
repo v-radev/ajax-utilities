@@ -1,5 +1,9 @@
-
+/**
+ * Utility AJAX functions
+ * @author V.Radev <mail@radev.info>
+ */
 var Ajax = function (){
+    this.queue = true;
     return this;
 };
 
@@ -53,13 +57,7 @@ Ajax.prototype.onPost = function(event, selector, ajaxUrl, ajaxData) {
     ajaxUrl = typeof ajaxUrl !== 'undefined' ? ajaxUrl : '';
     ajaxData = typeof ajaxData !== 'undefined' ? ajaxData : {};
 
-    this.on(event, selector, { method: 'POST', url: ajaxUrl, data: ajaxData })
-        .done(function(data){
-            return data;
-        })
-        .fail(function(){
-            return false;
-        });
+    return this.on(event, selector, { method: 'POST', url: ajaxUrl, data: ajaxData });
 };
 
 Ajax.prototype.post = function(ajaxUrl, ajaxData) {
@@ -67,12 +65,6 @@ Ajax.prototype.post = function(ajaxUrl, ajaxData) {
     ajaxUrl = typeof ajaxUrl !== 'undefined' ? ajaxUrl : '';
     ajaxData = typeof ajaxData !== 'undefined' ? ajaxData : {};
 
-    this.send({ method: 'POST', url: ajaxUrl, data: ajaxData })
-        .done(function(data){
-            return data;
-        })
-        .fail(function(){
-            return false;
-        });
+    return this.send({ method: 'POST', url: ajaxUrl, data: ajaxData });
 };
 
