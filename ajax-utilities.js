@@ -6,6 +6,7 @@
 var Ajax = function (){
     this.requests = [];
     this.queue = true;
+    this.queueRunning = false;
     return this;
 };
 
@@ -18,7 +19,7 @@ Ajax.prototype.send = function(params){
         beforeSend: function(){}
     };
 
-    params = $.extend(defaults, params);
+    params = jQuery.extend(defaults, params);
 
     //Overwrite these callback hooks
     params.error = function(){};
@@ -37,40 +38,6 @@ Ajax.prototype.send = function(params){
     }
 };
 
-Ajax.prototype.on = function(event, selector, ajaxOptions) {
-
-    var that = this;
-
-    //Return a Deferred so you can be able to hook done(), fail() and always() to Ajax.on()
-    return jQuery.Deferred(function(deferred) {
-
-        //Listen for DOM event on selector
-        jQuery(document).on(event, selector, function(e) {
-
-            e.preventDefault();
-
-            //When event occurs send request
-            that.send(ajaxOptions)
-                .done(function(reponse) {
-                    //If request succeeds resolve the deferred that is hooked to the Ajax.on() (meaning resolve self)
-                    deferred.resolve(reponse);
-                })
-                .fail(function(response){
-                    //If request fails reject the deferred that is hooked to the Ajax.on() (meaning reject self)
-                    deferred.reject(response);
-                });
-        });
-    }).promise();
-};
-
-Ajax.prototype.onPost = function(event, selector, ajaxUrl, ajaxData) {
-
-    ajaxUrl = typeof ajaxUrl !== 'undefined' ? ajaxUrl : '';
-    ajaxData = typeof ajaxData !== 'undefined' ? ajaxData : {};
-
-    return this.on(event, selector, { method: 'POST', url: ajaxUrl, data: ajaxData });
-};
-
 Ajax.prototype.post = function(ajaxUrl, ajaxData) {
 
     ajaxUrl = typeof ajaxUrl !== 'undefined' ? ajaxUrl : '';
@@ -86,31 +53,26 @@ Ajax.prototype.queueRequest = function(params) {
 Ajax.prototype.runQueue = function() {
     var self = this;
 
+    //If there is request running currently
+    if ( this.queueRunning ){
+        //Wait 1s and try again
+        setTimeout(function(){
+            return self.runQueue();
+        }, 200);
+    }
+
     //If you have requests
     if( self.requests.length ) {
+
+        this.queueRunning = true;
+
         //Make the complete() remove the request after its done and continue the queue
         self.requests[0].complete = function() {
             self.requests.shift();
-            self.runQueue.apply(self, []);
-            console.log( 'Removing request and running queue again' );//TODO
+            self.queueRunning = false;
+            self.runQueue.apply(self, []);//This will check the queue again when the request is done
         };
 
         return jQuery.ajax(self.requests[0]);
     }
-    else {
-        console.log( 'Checking que after 1s is passed' );//TODO
-        //After 1s check queue for new requests
-        self.queueTimeout = setTimeout(function() {
-            self.runQueue.apply(self, []);
-        }, 1000);
-    }
 };
-
-Ajax.prototype.stopQueue = function() {
-    this.requests = [];
-    clearTimeout(this.queueTimeout);
-};
-
-
-//TODO after runQueue is executed once it should not be executed again on request
-//TODO if a timeout is set once it should not be set again

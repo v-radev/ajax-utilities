@@ -3,7 +3,7 @@
 //AJAX request
 if ( !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest' )
 {
-    sleep(2);
+    usleep(350000);
     echo json_encode($_POST);
     return;
 }
@@ -22,9 +22,7 @@ if ( !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_RE
 
 
 <a id="simpleRequest" href="#">Send simple request</a>
-<a id="onRequest" href="#">Send on request</a>
-<a id="potsRequest" href="#">Send post request</a>
-<a id="onPostRequest" href="#">Send on post request</a>
+<a id="postRequest" href="#">Send post request</a>
 
 <script type="text/javascript">
 
@@ -47,15 +45,7 @@ if ( !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_RE
             });
     });
 
-    a.on('click', 'a#onRequest', params)
-        .done(function(data){
-            console.log( data );
-        })
-        .always(function(){
-            console.log( 'ON REQUEST DONE' );
-        });
-
-    $("a#potsRequest").on("click", function(e){
+    $("a#postRequest").on("click", function(e){
 
         e.preventDefault();
 
@@ -68,13 +58,6 @@ if ( !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_RE
             });
     });
 
-    a.onPost('click', 'a#onPostRequest', 'index.php', { user: 'Roku', password: 'a110rN0th1nG'})
-        .done(function(data){
-            console.log( data );
-        })
-        .always(function(){
-            console.log( 'ONPOST REQUEST DONE' );
-        });
 
 </script>
 
