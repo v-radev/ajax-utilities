@@ -76,13 +76,6 @@ Ajax.prototype.runQueue = function() {
             }
         }
 
-        //Wait and try again
-        setTimeout(function(){
-            if ( !self.queueRunning ){
-                self.runQueue();
-            }
-        }, 250);
-
         //Return a promise so you can be able to hook done(), fail() and always()
         return deferred.promise();
     }//END if queue is running
@@ -94,6 +87,7 @@ Ajax.prototype.runQueue = function() {
         //Set this request to active
         self.requests[0].active = true;
 
+        //Modify the complete()
         self.requests[0].params.complete = function() {
             //Remove this request
             self.requests.shift();
@@ -105,6 +99,7 @@ Ajax.prototype.runQueue = function() {
 
         //If request has a deferred
         if ( self.requests[0].hasOwnProperty('deferred') ){
+            //Run request and notify the deferred
             jQuery.ajax(self.requests[0].params)
                 .done(function(data) {
                     self.requests[0].deferred.resolve(data);
@@ -117,4 +112,4 @@ Ajax.prototype.runQueue = function() {
 
         return jQuery.ajax(self.requests[0].params);
     }//END if requests
-};
+};//END runQueue()
