@@ -1,7 +1,6 @@
 /**
  * Utility AJAX functions
  * @author V.Radev <mail@radev.info>
- * (Queue code by http://stackoverflow.com/users/1386886/jandy)
  */
 var Ajax = function (){
     this.requests = [];
@@ -47,32 +46,75 @@ Ajax.prototype.post = function(ajaxUrl, ajaxData) {
 };
 
 Ajax.prototype.queueRequest = function(params) {
-    this.requests.push(params);
+    var obj = {};
+    obj.params = params;
+    obj.active = false;
+    this.requests.push(obj);
 };
 
 Ajax.prototype.runQueue = function() {
-    var self = this;
+    var self = this,
+        i,
+        deferred;
 
     //If there is request running currently
-    if ( this.queueRunning ){
-        //Wait 1s and try again
+    if ( self.queueRunning ){
+
+        deferred = $.Deferred();
+
+        //Loop all requests
+        for (i = 0; i < self.requests.length; i++) {
+            //If the request is not active
+            if ( self.requests[i].hasOwnProperty('active') && !self.requests[i].active ){
+                //If the request has not been handled by this loop
+                if ( !self.requests[i].hasOwnProperty('handled') || !self.requests[i].handled ){
+                    //Add the deferred to the request
+                    self.requests[i].deferred = deferred;
+                    //Mark request as handled
+                    self.requests[i].handled = true;
+                }
+            }
+        }
+
+        //Wait and try again
         setTimeout(function(){
-            return self.runQueue();
-        }, 200);
-    }
+            if ( !self.queueRunning ){
+                self.runQueue();
+            }
+        }, 250);
+
+        //Return a promise so you can be able to hook done(), fail() and always()
+        return deferred.promise();
+    }//END if queue is running
 
     //If you have requests
     if( self.requests.length ) {
-
+        //Queue is running
         this.queueRunning = true;
+        //Set this request to active
+        self.requests[0].active = true;
 
-        //Make the complete() remove the request after its done and continue the queue
-        self.requests[0].complete = function() {
+        self.requests[0].params.complete = function() {
+            //Remove this request
             self.requests.shift();
+            //Make queue available
             self.queueRunning = false;
+            //Continue queue
             self.runQueue.apply(self, []);//This will check the queue again when the request is done
         };
 
-        return jQuery.ajax(self.requests[0]);
-    }
+        //If request has a deferred
+        if ( self.requests[0].hasOwnProperty('deferred') ){
+            jQuery.ajax(self.requests[0].params)
+                .done(function(data) {
+                    self.requests[0].deferred.resolve(data);
+                })
+                .fail(function(data){
+                    self.requests[0].deferred.reject(data);
+                });
+            return;
+        }
+
+        return jQuery.ajax(self.requests[0].params);
+    }//END if requests
 };
