@@ -11,11 +11,12 @@ var Ajax = function (){
 
 Ajax.prototype.send = function(params){
 
-    var defaults = {
-        method: 'POST',
-        url: '',
-        data: {},
-        beforeSend: function(){}
+    var self = this,
+        defaults = {
+            method: 'POST',
+            url: '',
+            data: {},
+            beforeSend: function(){}
     };
 
     params = jQuery.extend(defaults, params);
@@ -24,14 +25,14 @@ Ajax.prototype.send = function(params){
     params.error = function(){};
     params.success = function(){};
     //If queue is disabled overwrite complete()
-    if ( !this.queue ){
+    if ( !self.queue ){
         params.complete = function(){};
     }
 
     //If queue is enabled
-    if ( this.queue ){
-        this.queueRequest(params);
-        return this.runQueue();
+    if ( self.queue ){
+        self.queueRequest(params);
+        return self.runQueue();
     } else {
         return jQuery.ajax(params);
     }
@@ -83,7 +84,7 @@ Ajax.prototype.runQueue = function() {
     //If you have requests
     if( self.requests.length ) {
         //Queue is running
-        this.queueRunning = true;
+        self.queueRunning = true;
         //Set this request to active
         self.requests[0].active = true;
 
